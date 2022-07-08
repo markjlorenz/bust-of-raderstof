@@ -1,6 +1,33 @@
 # Bust of Raderstorf
 > Ohio's most famous nurse.
 
+## Setup
+
+1. Install CircuitPython on the board, [the boards I use from Unexpected Maker](https://esp32s3.io/) come with CircuitPython installed out of the box.
+
+2. Copy `code.py` and `lib/` to the `CIRCUITPY` device that shows up when you connect the board's USB to your computer.
+
+3. I used the [Mu Editor](https://codewith.mu/) to view the serial communications, this is helpful, but optional.
+
+4. 3D print the model in `model/`.  If you have an Ender3 v2 (or clone) you can use the `.gcode` provided.
+
+5. Wire pins `D10`, `D7`, `D3`, `D1` to the positive leg of the LEDs (I used color flashing LEDs)
+
+6. Wire pins `D14`, and `D12` to some 26AWG motor coil wire, this will be come the touch sensors.
+
+7. Wire the grounds
+
+8. Pass the touch wires through the holes that lead up through the shoulder, and use a pocket knife to gently scrape away the wire insulation.
+
+9. Place your hand on Tim's shoulder, and ask for inspiriation.  Maybe you'll get it.
+
+![shoulder wire](https://raw.githubusercontent.com/markjlorenz/bust-of-raderstof/main/doc/IMG_7705.JPG)
+![inside wiring](https://raw.githubusercontent.com/markjlorenz/bust-of-raderstof/main/doc/IMG_7706.JPG)
+
+It's important to keep the LiPo charged to >20% of capacity, so the blue LED on the board will blink to let you know the remaining battery life.  1 blink, the battery is full.  10 blinks or more and it's time to charge.
+
+## Working with CircuitPython
+
 Documentation for CircuitPython: https://docs.circuitpython.org/en/latest/shared-bindings/touchio/index.html
 Helper modules: https://github.com/UnexpectedMaker/esp32s3/tree/main/code
 STEP file: https://github.com/UnexpectedMaker/esp32s3/blob/main/3d%20models/FeatherS3_P4.step
@@ -12,75 +39,6 @@ See the details of module:
 >>> import board
 >>> board.
 ```
-
-```python
-# Make a light go white when the pin is touched.
-
-import time, gc, os
-import neopixel
-import board, digitalio
-import feathers3
-import touchio
-
-
-# Create a NeoPixel instance
-# Brightness of 0.3 is ample for the 1515 sized LED
-pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.3, auto_write=True, pixel_order=neopixel.RGB)
-
-# Say hello
-print("\nHello from FeatherS3!")
-print("------------------\n")
-
-# Show available memory
-print("Memory Info - gc.mem_free()")
-print("---------------------------")
-print("{} Bytes\n".format(gc.mem_free()))
-
-flash = os.statvfs('/')
-flash_size = flash[0] * flash[2]
-flash_free = flash[0] * flash[3]
-# Show flash size
-print("Flash - os.statvfs('/')")
-print("---------------------------")
-print("Size: {} Bytes\nFree: {} Bytes\n".format(flash_size, flash_free))
-
-print("Pixel Time!\n")
-
-# Create a colour wheel index int
-color_index = 0
-
-# Turn on the power to the NeoPixel
-feathers3.set_ldo2_power(True)
-
-touch = touchio.TouchIn(board.D18)
-touch.threshold = 65000
-
-# Rainbow colours on the NeoPixel
-while True:
-    # if the cap sensor is touched, set the light to a specific color_index
-    print("{}, {}", touch.raw_value, touch.value)
-    if touch.value:
-        pixel[0] = ( 0xff, 0xff, 0xff, 0.5)
-        continue
-
-    # Get the R,G,B values of the next colour
-    r,g,b = feathers3.rgb_color_wheel( color_index )
-    # Set the colour on the NeoPixel
-    pixel[0] = ( r, g, b, 0.5)
-    # Increase the wheel index
-    color_index += 1
-
-    # If the index == 255, loop it
-    if color_index == 255:
-        color_index = 0
-        # Invert the internal LED state every half colour cycle
-        feathers3.led_blink()
-
-    # Sleep for 15ms so the colour cycle isn't too fast
-    time.sleep(0.015)
-```
-
-https://github.com/adafruit/esp-idf/blob/circuitpython-v4.4/components/esp_hw_support/sleep_modes.c#L416
 
 ## Deep sleep doesn't work
 - https://github.com/adafruit/circuitpython/issues/6090
