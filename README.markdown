@@ -1,6 +1,8 @@
 # Bust of Raderstorf
 > Ohio's most famous nurse.
 
+![Get inspiration from Tim](https://github.com/markjlorenz/bust-of-raderstof/raw/main/doc/demo.gif)
+
 ## Setup
 
 1. Install CircuitPython on the board, [the boards I use from Unexpected Maker](https://esp32s3.io/) come with CircuitPython installed out of the box.
