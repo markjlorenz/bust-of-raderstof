@@ -24,18 +24,16 @@ def allOn(trueOrFalse):
     led_3.value = trueOrFalse
     led_4.value = trueOrFalse
 
-async def ideaTime(duration):
-    allOn(True)
-    await asyncio.sleep(duration)
-
 async def checkTouchLatch(touchLatch):
     MAX_TIME = 5  # seconds
+    MIN_TIME = 2  # seconds
     MAX_MONO = time.monotonic() + MAX_TIME
+    MIN_MONO = time.monotonic() + MIN_TIME
 
     print("touchLatch: {}".format(touchLatch.raw_value))
 
-    while touchLatch.value:
-        if (time.monotonic() * 1000) % 100 <= 1:
+    while touchLatch.value or time.monotonic() > MIN_MONO:
+        if (time.monotonic() * 1000) % 10 <= 1:
             print("touchLatch: {}".format(touchLatch.raw_value))
 
         if time.monotonic() > MAX_MONO:
@@ -56,8 +54,7 @@ async def batteryReport():
     BATTERY_MIN = 3.2
     BATTERY_MAX = 4.2
     batteryPercent = (voltage - BATTERY_MIN) / (BATTERY_MAX - BATTERY_MIN)
-    #batteryBlinks = math.floor(10 - batteryPercent * 10)
-    batteryBlinks = math.floor(batteryPercent * 10)
+    batteryBlinks = math.floor(10 - batteryPercent * 10)
     while batteryBlinks > 0:
         feathers3.led_set(True)
         await asyncio.sleep(0.1)
@@ -74,14 +71,13 @@ wakeAlarm = alarm.touch.TouchAlarm(board.D16)
 #
 def initTouchLatch():
     touch = touchio.TouchIn(board.D17)
-    touch.threshold = 19200 # will need to tune this value once installed
+    touch.threshold = 19150 # will need to tune this value once installed
     return touch
 
 #while True:
 #    allOn(True)
 
 async def main():
-    MIN_TIME = 2   # seconds
     touchLatch   = initTouchLatch()
 
     while True:
@@ -92,10 +88,8 @@ async def main():
         print("Idea time!")
         touchLatch          = initTouchLatch()
         batteryBlinkTask    = batteryBlinkTask = asyncio.create_task(batteryReport())
-        ideaTimeTask        = asyncio.create_task(ideaTime(MIN_TIME))
         checkTouchLatchTask = asyncio.create_task(checkTouchLatch(touchLatch))
-        await asyncio.gather(batteryBlinkTask, ideaTimeTask, checkTouchLatchTask)
+        await asyncio.gather(batteryBlinkTask, checkTouchLatchTask)
         allOn(False)
 
 asyncio.run(main())
-
