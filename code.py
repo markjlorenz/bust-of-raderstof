@@ -71,7 +71,7 @@ wakeAlarm = alarm.touch.TouchAlarm(board.D16)
 #
 def initTouchLatch():
     touch = touchio.TouchIn(board.D17)
-    touch.threshold = 19150 # will need to tune this value once installed
+    touch.threshold = 19600 # will need to tune this value once installed
     return touch
 
 #while True:
