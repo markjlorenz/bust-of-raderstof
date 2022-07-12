@@ -46,3 +46,6 @@ See the details of module:
 - https://github.com/adafruit/circuitpython/issues/6090
 - https://github.com/espressif/esp-idf/issues/8569
 
+## Printing
+
+![Idea Tim Printing](https://github.com/markjlorenz/bust-of-raderstof/raw/main/doc/Tim-Printing.gif)
